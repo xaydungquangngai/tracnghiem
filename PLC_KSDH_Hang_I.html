@@ -2,103 +2,178 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>Trắc nghiệm tương tác </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trắc nghiệm tương tác</title>
   <script src="PLC_KSDH_Hang_I.js" defer></script>
   <style>
-    * { box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #e0f7fa, #e1f5fe);
-      min-height: 100vh;
+      background: #f0f4f8;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header cố định */
+    .fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 30px;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 1000;
     }
-    .quiz-container {
-      background: white;
-      width: 100%;
-      max-width: 800px;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
+
+    .fixed-header .title {
+      font-size: 16px;
+      font-weight: bold;
       color: #00796b;
     }
-    .question-block {
-      margin-bottom: 30px;
-      padding: 20px;
-      border-radius: 12px;
-      background: #f9f9f9;
-      border: 1px solid #ccc;
+
+    .fixed-header .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
     }
+
+    .fixed-header button {
+      padding: 6px 12px;
+      font-size: 13px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .fixed-header button:hover {
+      background-color: #005b50;
+    }
+
+    /* Phần câu hỏi cuộn được */
+    .content {
+      margin-top: 72px; /* Đẩy xuống dưới header */
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .question-block {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid transparent;
+    }
+
     .question-block.correct {
-      border-color: green;
+      border-left-color: #4caf50;
       background: #e8f5e9;
     }
+
     .question-block.incorrect {
-      border-color: red;
+      border-left-color: #f44336;
       background: #ffebee;
     }
+
     .question {
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
+
     .options label {
       display: block;
-      padding: 8px;
-      margin-bottom: 6px;
-      border-radius: 6px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      margin-bottom: 8px;
       cursor: pointer;
-      background: white;
-      transition: background 0.2s, border 0.2s;
+      transition: 0.2s ease;
     }
+
     .options label.selected {
       background-color: #c8e6c9;
       border-color: #66bb6a;
     }
+
     .options label.incorrect-selected {
       background-color: #ffcdd2;
       border-color: #e57373;
     }
+
     .options input[type="radio"] {
       display: none;
     }
+
     .result-message {
-      margin-top: 10px;
-      font-weight: bold;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 500;
     }
-    .summary {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #00796b;
-    }
-    #resetBtn {
-      display: none;
-      margin: 20px auto 0;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      background-color: #00796b;
-      color: white;
-      cursor: pointer;
+
+    @media (max-width: 480px) {
+      .fixed-header {
+        flex-direction: column;
+        height: auto;
+        padding: 8px;
+        gap: 6px;
+        align-items: flex-start;
+      }
+
+      .fixed-header .controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 13px;
+      }
+
+      .content {
+        padding: 12px;
+      }
+
+      .question {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="quiz-container">
-    <h1>Trắc Nghiệm Câu hỏi Pháp luật chung - Khảo sát địa hình - Hạng I</h1>
-    <div id="quiz"></div>
-    <div class="summary" id="summary">Chưa có câu nào được trả lời.</div>
-    <button id="resetBtn">🔁 Làm lại</button>
+
+  <!-- Header cố định -->
+  <div class="fixed-header">
+    <div class="title">Trắc nghiệm câu hỏi Pháp luật chung - Khảo sát địa hình - Hạng I</div>
+    <div class="controls">
+      <span id="summary">Đã trả lời: 0/0 | Đúng: 0/0</span>
+      <button id="resetBtn" style="display: none;">🔁 Làm lại</button>
+    </div>
+  </div>
+
+  <!-- Nội dung câu hỏi -->
+  <div class="content">
+    <div class="quiz-container" id="quiz"></div>
   </div>
 
   <script>
@@ -112,8 +187,10 @@
         quizEl.innerHTML = '';
         score = 0;
         answeredCount = 0;
-        summaryEl.innerText = 'Chưa có câu nào được trả lời.';
+        summaryEl.innerText = 'Đã trả lời: 0/0 | Đúng: 0/0';
         resetBtn.style.display = 'none';
+
+        summaryEl.innerText = `Đã trả lời: 0/${questions.length} | Đúng: 0/0`;
 
         questions.forEach((q, idx) => {
           const block = document.createElement('div');
@@ -128,10 +205,7 @@
 
           q.options.forEach((opt, optIdx) => {
             const label = document.createElement('label');
-            label.innerHTML = `
-              <input type="radio" name="q${idx}" value="${optIdx}" />
-              ${opt}
-            `;
+            label.innerHTML = `<input type="radio" name="q${idx}" value="${optIdx}" /> ${opt}`;
             label.addEventListener('click', () => {
               if (block.classList.contains('answered')) return;
               block.classList.add('answered');
@@ -155,10 +229,8 @@
                 : `❌ Sai. Đáp án đúng: ${q.options[q.correct]}`;
               block.appendChild(result);
 
-              // Cập nhật summary
               summaryEl.innerText = `Đã trả lời: ${answeredCount}/${questions.length} | Đúng: ${score}/${answeredCount}`;
-              // Hiện nút làm lại
-              resetBtn.style.display = 'block';
+              resetBtn.style.display = 'inline-block';
             });
 
             options.appendChild(label);
@@ -171,9 +243,9 @@
       }
 
       resetBtn.addEventListener('click', generateQuiz);
-
       generateQuiz();
     });
   </script>
+
 </body>
 </html>
