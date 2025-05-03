@@ -65,6 +65,14 @@
       background-color: #005b50;
     }
 
+	.subtitle {
+	  font-size: 0.5rem;       /* Nhỏ hơn: tương đương ~12px */
+	  font-style: italic;       /* Chữ nghiêng */
+	  color: #6b7280;           /* Màu xám nhẹ */
+	  margin-top: 4px;
+	}
+
+
     /* Phần câu hỏi cuộn được */
     .content {
       margin-top: 72px; /* Đẩy xuống dưới header */
@@ -162,15 +170,17 @@
 </head>
 <body>
 
-  <!-- Header cố định -->
-  <div class="fixed-header">
+<!-- Header cố định -->
+<div class="fixed-header">
+  <div class="title-block">
     <div class="title">Trắc nghiệm câu hỏi Pháp luật chung - Khảo sát địa hình - Hạng I</div>
-    <div class="controls">
-      <span id="summary">Đã trả lời: 0/0 | Đúng: 0/0</span>
-      <button id="resetBtn" style="display: none;">🔁 Làm lại</button>
-    </div>
+<div class="subtitle">  (Kèm theo Quyết định số 163/QĐ-BXD ngày 18/02/2025 của Bộ Xây dựng về việc ban hành bộ câu hỏi phục vụ sát hạch cấp chứng chỉ hành nghề hoạt động xây dựng)</div>
   </div>
-
+  <div class="controls">
+    <span id="summary">Đã trả lời: 0/0 | Đúng: 0/0</span>
+    <button id="resetBtn" style="display: none;">🔁 Làm lại</button>
+  </div>
+</div>
   <!-- Nội dung câu hỏi -->
   <div class="content">
     <div class="quiz-container" id="quiz"></div>
