@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trắc nghiệm tương tác</title>
+  <script src="PLR_KSDH_Hang_I.js" defer></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #333;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header cố định */
+    .fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 1000;
+    }
+
+    .fixed-header .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #00796b;
+    }
+
+    .fixed-header .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+
+    .fixed-header button {
+      padding: 6px 12px;
+      font-size: 13px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .fixed-header button:hover {
+      background-color: #005b50;
+    }
+
+	.subtitle {
+	  font-size: 0.5rem;       /* Nhỏ hơn: tương đương ~12px */
+	  font-style: italic;       /* Chữ nghiêng */
+	  color: #6b7280;           /* Màu xám nhẹ */
+	  margin-top: 4px;
+	}
+
+
+    /* Phần câu hỏi cuộn được */
+    .content {
+      margin-top: 72px; /* Đẩy xuống dưới header */
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .quiz-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .question-block {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid transparent;
+    }
+
+    .question-block.correct {
+      border-left-color: #4caf50;
+      background: #e8f5e9;
+    }
+
+    .question-block.incorrect {
+      border-left-color: #f44336;
+      background: #ffebee;
+    }
+
+    .question {
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .options label {
+      display: block;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .options label.selected {
+      background-color: #c8e6c9;
+      border-color: #66bb6a;
+    }
+
+    .options label.incorrect-selected {
+      background-color: #ffcdd2;
+      border-color: #e57373;
+    }
+
+    .options input[type="radio"] {
+      display: none;
+    }
+
+    .result-message {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 480px) {
+      .fixed-header {
+        flex-direction: column;
+        height: auto;
+        padding: 8px;
+        gap: 6px;
+        align-items: flex-start;
+      }
+
+      .fixed-header .controls {
+        flex-wrap: wrap;
+        gap: 6px;
+        font-size: 13px;
+      }
+
+      .content {
+        padding: 12px;
+      }
+
+      .question {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header cố định -->
+<div class="fixed-header">
+  <div class="title-block">
+    <div class="title">Trắc nghiệm câu hỏi Pháp luật riêng - Khảo sát địa hình - Hạng I</div>
+<div class="subtitle">  (Kèm theo Quyết định số 163/QĐ-BXD ngày 18/02/2025 của Bộ Xây dựng về việc ban hành bộ câu hỏi phục vụ sát hạch cấp chứng chỉ hành nghề hoạt động xây dựng)</div>
+  </div>
+  <div class="controls">
+    <span id="summary">Đã trả lời: 0/0 | Đúng: 0/0</span>
+    <button id="resetBtn" style="display: none;">🔁 Làm lại</button>
+  </div>
+</div>
+  <!-- Nội dung câu hỏi -->
+  <div class="content">
+    <div class="quiz-container" id="quiz"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const quizEl = document.getElementById('quiz');
+      const summaryEl = document.getElementById('summary');
+      const resetBtn = document.getElementById('resetBtn');
+      let score = 0, answeredCount = 0;
+
+      function generateQuiz() {
+        quizEl.innerHTML = '';
+        score = 0;
+        answeredCount = 0;
+        summaryEl.innerText = 'Đã trả lời: 0/0 | Đúng: 0/0';
+        resetBtn.style.display = 'none';
+
+        summaryEl.innerText = `Đã trả lời: 0/${questions.length} | Đúng: 0/0`;
+
+        questions.forEach((q, idx) => {
+          const block = document.createElement('div');
+          block.className = 'question-block';
+
+          const qText = document.createElement('div');
+          qText.className = 'question';
+          qText.innerText = `${idx + 1}. ${q.question}`;
+
+          const options = document.createElement('div');
+          options.className = 'options';
+
+          q.options.forEach((opt, optIdx) => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="radio" name="q${idx}" value="${optIdx}" /> ${opt}`;
+            label.addEventListener('click', () => {
+              if (block.classList.contains('answered')) return;
+              block.classList.add('answered');
+              answeredCount++;
+
+              const isCorrect = optIdx === q.correct;
+              if (isCorrect) {
+                score++;
+                block.classList.add('correct');
+                label.classList.add('selected');
+              } else {
+                block.classList.add('incorrect');
+                label.classList.add('incorrect-selected');
+                options.children[q.correct].classList.add('selected');
+              }
+
+              const result = document.createElement('div');
+              result.className = 'result-message';
+              result.innerText = isCorrect
+                ? '✅ Đúng rồi!'
+                : `❌ Sai. Đáp án đúng: ${q.options[q.correct]}`;
+              block.appendChild(result);
+
+              summaryEl.innerText = `Đã trả lời: ${answeredCount}/${questions.length} | Đúng: ${score}/${answeredCount}`;
+              resetBtn.style.display = 'inline-block';
+            });
+
+            options.appendChild(label);
+          });
+
+          block.appendChild(qText);
+          block.appendChild(options);
+          quizEl.appendChild(block);
+        });
+      }
+
+      resetBtn.addEventListener('click', generateQuiz);
+      generateQuiz();
+    });
+  </script>
+
+</body>
+</html>
